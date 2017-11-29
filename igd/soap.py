@@ -1,8 +1,15 @@
-from xml.dom.minidom import parseString
-
 import asks
+from bs4 import BeautifulSoup
 
 from . import proto
+
+
+class Error(Exception):
+    """SOAP error."""
+
+    def __init__(self, code: int, msg: str) -> None:
+        super().__init__(msg)
+        self.code = code
 
 
 async def post(url: str, msg: str, soap_action: str) -> bytes:
@@ -25,11 +32,7 @@ async def post(url: str, msg: str, soap_action: str) -> bytes:
 
 def _validate_response(resp: asks.response_objects.Response) -> None:
     if resp.status_code == 500:
-        err_dom = parseString(resp.content)
-        err_code = proto._node_value(err_dom.getElementsByTagName('errorCode')[0])
-        err_msg = proto._node_value(
-            err_dom.getElementsByTagName('errorDescription')[0]
-        )
-        raise Exception(
-            'SOAP request error: {0} - {1}'.format(err_code, err_msg)
-        )
+        doc = BeautifulSoup(resp.content, 'lxml-xml')
+        err_code = int(doc.errorCode.string)
+        err_msg = doc.errorDescription.string
+        raise Error(err_code, err_msg)
