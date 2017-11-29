@@ -12,6 +12,9 @@ class Gateway:
         resp = await soap.post(self.control_url, body, soap_action)
         return proto.parse_ext_ip(resp)
 
+    # TODO: make it async, now every request is made synchronously
+    # until all mappings are fetched. The reason is this issue:
+    # https://github.com/dabeaz/curio/issues/236
     async def get_port_mappings(self) -> List[proto.PortMapping]:
         """Fetches all port mappings at once."""
         mappings = []
