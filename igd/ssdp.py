@@ -58,7 +58,8 @@ def _parse_igd_profile(profile_xml: bytes) -> Tuple[str, str]:
     elems = doc.find_all('serviceType')
     for service_type in elems:
         upnp_schema = service_type.string.split(':')[-2]
-        if upnp_schema in ['WANIPConnection', 'WANPPPConnection']:
+        if upnp_schema in ['WANIPConnection', 'WANPPPConnection',
+                           'WFAWLANConfig']:
             control_url = service_type.parent.find('controlURL').string
             return control_url, upnp_schema
 
