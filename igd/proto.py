@@ -50,6 +50,9 @@ class PortMapping:
     def __str__(self) -> str:
         return 'PortMapping {}'.format(str(self.__dict__))
 
+    def __repr__(self) -> str:
+        return str(self)
+
 
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:
     doc = BeautifulSoup(xml_resp, 'lxml-xml')
