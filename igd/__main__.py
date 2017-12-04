@@ -22,6 +22,22 @@ def ip():
     print(ext_ip)
 
 
+@click.command(
+    short_help='Add new port mapping.',
+    help='Adds new port mapping.',
+)
+def add():
+    pass
+
+
+@click.command(
+    short_help='Remove port mapping.',
+    help='Removes port mapping that match given filters.',
+)
+def rm():
+    pass
+
+
 @click.group()
 def cli():
     pass
@@ -30,6 +46,8 @@ def cli():
 def main() -> None:
     cli.add_command(ls)
     cli.add_command(ip)
+    cli.add_command(add)
+    cli.add_command(rm)
     cli()
 
 
