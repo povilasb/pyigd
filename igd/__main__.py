@@ -9,8 +9,7 @@ from . import ssdp, proto, soap, core
     help='Get all port mappings. Various filtering options available.',
 )
 def ls():
-    gateway = curio.run(ssdp.find_gateway)
-    port_mapping = curio.run(gateway.get_port_mappings)
+    port_mapping = curio.run(core.get_port_mappings)
     print(port_mapping)
 
 
