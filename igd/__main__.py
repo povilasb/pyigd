@@ -1,7 +1,7 @@
 import curio
 import click
 
-from . import ssdp, proto, soap, core
+from . import core
 
 
 @click.command(

@@ -1,8 +1,6 @@
 import asks
 from bs4 import BeautifulSoup
 
-from . import proto
-
 
 class Error(Exception):
     """SOAP error."""

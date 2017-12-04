@@ -5,12 +5,13 @@ from typing import Tuple
 
 from curio import socket
 import asks
-asks.init('curio')
 from yarl import URL
 from bs4 import BeautifulSoup
 
 from . import Gateway
 
+
+asks.init('curio')
 
 remove_whitespace = re.compile(r'>\s*<')
 SSDP_REQUEST = b'M-SEARCH * HTTP/1.1\r\n' \
@@ -42,7 +43,8 @@ async def _make_ssdp_request() -> str:
 def _parse_location_from(response: str) -> str:
     """Parse raw HTTP response to retrieve the UPnP location header."""
     parsed = re.findall(r'(?P<name>.*?): (?P<value>.*?)\r\n', response)
-    location_header = list(filter(lambda x: x[0].lower() == 'location', parsed))
+    location_header = list(
+        filter(lambda x: x[0].lower() == 'location', parsed))
 
     if not len(location_header):
         return False
@@ -73,18 +75,18 @@ async def _get_local_ip() -> str:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     # not using <broadcast> because gevents getaddrinfo doesn't like that
-        # using port 1 as per hobbldygoop's comment about port 0 not working on osx:
-        # https://github.com/sirMackk/ZeroNet/commit/fdcd15cf8df0008a2070647d4d28ffedb503fba2#commitcomment-9863928
+    # using port 1 as per hobbldygoop's comment about port 0 not working on osx:
+    # https://github.com/sirMackk/ZeroNet/commit/fdcd15cf8df0008a2070647d4d28ffedb503fba2#commitcomment-9863928
     await sock.connect(('239.255.255.250', 1))
     return sock.getsockname()[0]
 
 
 def create_soap_message(ip: str, port: int, description="pyigd",
-                         protocol="TCP", upnp_schema='WANIPConnection'):
+                        protocol="TCP", upnp_schema='WANIPConnection'):
     """
     Build a SOAP AddPortMapping message.
     """
-    #current_ip = _get_local_ip()
+    # current_ip = _get_local_ip()
     current_ip = ip
 
     soap_message = """<?xml version="1.0"?>
