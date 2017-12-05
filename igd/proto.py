@@ -3,6 +3,9 @@ from typing import Tuple
 from bs4 import BeautifulSoup
 
 
+# TODO: make XML based request builder class: RequestBuilder
+
+
 def get_ext_ip() -> str:
     header = '"urn:schemas-upnp-org:service:WANIPConnection:1#GetExternalIPAddress"'
     body = """<?xml version="1.0"?>
