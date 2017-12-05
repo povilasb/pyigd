@@ -16,6 +16,11 @@ async def get_port_mappings() -> List[proto.PortMapping]:
     return _format_mappings(mappings)
 
 
+async def add_port_mapping(mapping: proto.PortMapping) -> None:
+    gateway = await ssdp.find_gateway()
+    await gateway.add_port_mapping(mapping)
+
+
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:
     headers = ['Description', 'External Port', 'Protocol', 'Internal Port',
                'IP', 'Status']

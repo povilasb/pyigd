@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from bs4 import BeautifulSoup
 
 
@@ -51,6 +53,36 @@ class PortMapping:
 
     def __repr__(self) -> str:
         return str(self)
+
+
+def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
+    """
+    Note: skips remote host field, because I wasn't sure about def it's use.
+    """
+    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#AddPortMapping"'
+    body = """<?xml version="1.0"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:AddPortMapping xmlns:u="urn:schemas-upnp-org:service:WANIPConnection:1">
+            <NewRemoteHost></NewRemoteHost>
+            <NewExternalPort>{ext_port}</NewExternalPort>
+            <NewProtocol>{protocol}</NewProtocol>
+            <NewInternalPort>{int_port}</NewInternalPort>
+            <NewInternalClient>{ip}</NewInternalClient>
+            <NewEnabled>1</NewEnabled>
+            <NewPortMappingDescription>{description}</NewPortMappingDescription>
+            <NewLeaseDuration>{duration}</NewLeaseDuration>
+        </u:AddPortMapping>
+    </s:Body>
+</s:Envelope>""".format(
+        ext_port=mapping.external_port,
+        protocol=mapping.protocol,
+        int_port=mapping.internal_port,
+        ip=mapping.ip,
+        description=mapping.description,
+        duration=mapping.duration,
+    )
+    return header, body
 
 
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:

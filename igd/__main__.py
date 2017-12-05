@@ -1,7 +1,7 @@
 import curio
 import click
 
-from . import core
+from . import core, proto
 
 
 @click.command(
@@ -27,7 +27,9 @@ def ip():
     help='Adds new port mapping.',
 )
 def add():
-    pass
+    mapping = proto.PortMapping('', 5000, 6000, 'TCP', '192.168.1.10',
+                                True, 'test mapping', 20)
+    curio.run(core.add_port_mapping, mapping)
 
 
 @click.command(

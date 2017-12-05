@@ -36,5 +36,10 @@ class Gateway:
         resp = await soap.post(self.control_url, body, soap_action)
         return proto.parse_port_mapping(resp)
 
+    async def add_port_mapping(self, mapping: proto.PortMapping) -> None:
+        soap_action, req = proto.add_port_mapping(mapping)
+        resp = await soap.post(self.control_url, req, soap_action)
+        print(resp)
+
     def __str__(self) -> str:
         return 'Gateway( control_url: "{}" )'.format(self.control_url)
