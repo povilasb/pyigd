@@ -1,3 +1,4 @@
+aiomock==0.1.0
 pytest==3.0.5
 pytest-describe==0.10.3
 pytest-cov==2.4.0

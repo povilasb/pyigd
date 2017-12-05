@@ -22,20 +22,24 @@ SSDP_REQUEST = b'M-SEARCH * HTTP/1.1\r\n' \
 
 
 async def find_gateway() -> Gateway:
-    location = await _make_ssdp_request()
+    location, gateway_ip = await _make_ssdp_request()
     resp = await asks.get(location)
     control_path, upnp_schema = _parse_igd_profile(resp.content)
     control_url = URL(location).with_path(control_path)
-    return Gateway(str(control_url))
+    return Gateway(str(control_url), gateway_ip)
 
 
-async def _make_ssdp_request() -> str:
-    """Broadcast a UDP SSDP M-SEARCH packet and return IGD location."""
+async def _make_ssdp_request() -> Tuple[str, str]:
+    """Broadcast a UDP SSDP M-SEARCH packet and return IGD location.
+
+    Returns:
+        URL to IGD info and IGD IP address.
+    """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     await sock.sendto(SSDP_REQUEST, ('239.255.255.250', 1900))
     # TODO: add timeout
-    resp = await sock.recv(4096)
-    return _parse_location_from(resp.decode('ascii'))
+    resp, addr = await sock.recvfrom(4096)
+    return _parse_location_from(resp.decode('ascii')), addr[0]
 
 
 # TODO: return multiple locations

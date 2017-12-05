@@ -4,8 +4,9 @@ from . import proto, soap
 
 
 class Gateway:
-    def __init__(self, control_url: str) -> None:
+    def __init__(self, control_url: str, ip: str) -> None:
         self.control_url = control_url
+        self.ip = ip
 
     async def get_ext_ip(self) -> str:
         soap_action, body = proto.get_ext_ip()
