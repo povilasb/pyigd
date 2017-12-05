@@ -9,7 +9,7 @@ def read_fixture_bytes(fixture_name: str) -> bytes:
 
 
 def describe_parse_igd_profile():
-    def it_():
+    def it_extracts_upnpn_scheme_and_control_url():
         resp_xml = read_fixture_bytes('igd_info_resp.xml')
 
         control_url, upnp_schema = ssdp._parse_igd_profile(resp_xml)
