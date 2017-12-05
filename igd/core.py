@@ -1,6 +1,7 @@
 from typing import List
 
 from tabulate import tabulate
+from curio import socket
 
 from . import ssdp, proto
 
@@ -18,6 +19,8 @@ async def get_port_mappings() -> List[proto.PortMapping]:
 
 async def add_port_mapping(mapping: proto.PortMapping) -> None:
     gateway = await ssdp.find_gateway()
+    if mapping.ip is None:
+        mapping.ip = await _get_local_ip_to(gateway.ip)
     await gateway.add_port_mapping(mapping)
 
 
@@ -32,3 +35,10 @@ def _port_mapping_to_arr(mapping: proto.PortMapping) -> list:
     status = 'Enabled' if mapping.enabled else 'Disabled'
     return [mapping.description, mapping.external_port, mapping.protocol,
             mapping.internal_port, mapping.ip, status]
+
+
+async def _get_local_ip_to(gateway_ip: str) -> str:
+    """Find IP address of current interface."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    await sock.connect((gateway_ip, 0))
+    return sock.getsockname()[0]

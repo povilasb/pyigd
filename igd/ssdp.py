@@ -69,16 +69,3 @@ def _parse_igd_profile(profile_xml: bytes) -> Tuple[str, str]:
             return control_url, upnp_schema
 
     raise Exception('No IGD data found in response')
-
-
-# TODO: use gateway address to discover my IP. Because for every gateway
-# there's different IP
-async def _get_local_ip() -> str:
-    """ Find IP address of current interface."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # not using <broadcast> because gevents getaddrinfo doesn't like that
-    # using port 1 as per hobbldygoop's comment about port 0 not working on osx:
-    # https://github.com/sirMackk/ZeroNet/commit/fdcd15cf8df0008a2070647d4d28ffedb503fba2#commitcomment-9863928
-    await sock.connect(('239.255.255.250', 1))
-    return sock.getsockname()[0]
