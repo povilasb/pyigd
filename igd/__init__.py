@@ -49,6 +49,5 @@ class Gateway:
         print(resp)
         # TODO: handle response
 
-
     def __str__(self) -> str:
         return 'Gateway( control_url: "{}" )'.format(self.control_url)

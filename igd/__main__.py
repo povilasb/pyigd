@@ -58,7 +58,7 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
 
 @click.command(
     short_help='Remove port mapping.',
-    help='Removes port mapping that matches given filters. If protocol is '\
+    help='Removes port mapping that matches given filters. If protocol is '
          'not specified, mappings for both UDP and TCP are removed.',
 )
 @click.option('--protocol', '-p', 'protocol', type=str,
