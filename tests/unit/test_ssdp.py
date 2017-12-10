@@ -6,6 +6,8 @@ from aiomock import AIOMock
 
 from igd import ssdp
 
+from utils import AsyncMock
+
 
 def read_fixture_bytes(fixture_name: str) -> bytes:
     with open('tests/fixtures/{}'.format(fixture_name), 'rb') as f:
@@ -31,9 +33,3 @@ def describe_make_ssdp_request():
             _, igd_ip = curio.run(ssdp._make_ssdp_request())
 
             assert_that(igd_ip, is_('192.168.0.1'))
-
-
-class AsyncMock(AIOMock):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.async_return_value = kwargs.get('async_return_value')
