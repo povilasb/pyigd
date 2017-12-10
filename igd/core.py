@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from tabulate import tabulate
 from curio import socket
@@ -24,9 +24,11 @@ async def add_port_mapping(mapping: proto.PortMapping) -> None:
     await gateway.add_port_mapping(mapping)
 
 
-async def delete_port_mapping(ext_port: int, protocol: str) -> None:
+async def delete_port_mapping(ext_port: int, protocol: Optional[str]) -> None:
     gateway = await ssdp.find_gateway()
-    await gateway.delete_port_mapping(ext_port, protocol)
+    protocols = [protocol] if protocol is not None else ['TCP', 'UDP']
+    for prot in protocols:
+        await gateway.delete_port_mapping(ext_port, prot)
 
 
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:

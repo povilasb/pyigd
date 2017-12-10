@@ -58,10 +58,15 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
 
 @click.command(
     short_help='Remove port mapping.',
-    help='Removes port mapping that match given filters.',
+    help='Removes port mapping that matches given filters. If protocol is '\
+         'not specified, mappings for both UDP and TCP are removed.',
 )
-def rm():
-    curio.run(core.delete_port_mapping, 50479, 'TCP')
+@click.option('--ext-port', '-e', 'external_port', type=int, required=True,
+              help='External port.',)
+@click.option('--protocol', '-p', 'protocol', type=str,
+              help='UDP or TCP. Mixed letter case allowed.',)
+def rm(external_port: int, protocol: Optional[str]):
+    curio.run(core.delete_port_mapping, external_port, protocol)
 
 
 @click.group()
