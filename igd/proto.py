@@ -3,41 +3,6 @@ from typing import Tuple
 from bs4 import BeautifulSoup
 
 
-# TODO: make XML based request builder class: RequestBuilder
-
-
-def get_ext_ip() -> str:
-    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#GetExternalIPAddress"'
-    body = """<?xml version="1.0"?>
-    <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-        <s:Body>
-            <m:GetExternalIPAddress xmlns:m="urn:schemas-upnp-org:service:WANIPConnection:1">
-            </m:GetExternalIPAddress>
-        </s:Body>
-    </s:Envelope>
-    """
-    return header, body
-
-
-def parse_ext_ip(xml_resp: bytes) -> str:
-    doc = BeautifulSoup(xml_resp, 'lxml-xml')
-    return doc.NewExternalIPAddress.string
-
-
-def get_port_mapping(i: int) -> str:
-    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#GetGenericPortMappingEntry"'
-    body = """<?xml version="1.0"?>
-    <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-        <s:Body>
-            <m:GetGenericPortMappingEntry xmlns:m="urn:schemas-upnp-org:service:WANIPConnection:1">
-                <NewPortMappingIndex>{}</NewPortMappingIndex>
-            </m:GetGenericPortMappingEntry>
-        </s:Body>
-    </s:Envelope>
-    """.format(i)
-    return header, body
-
-
 class PortMapping:
     def __init__(self, remote_host: str, external_port: int,
                  internal_port: int, protocol: str, ip: str, enabled: bool,
@@ -58,55 +23,118 @@ class PortMapping:
         return str(self)
 
 
+class RequestBuilder:
+    def __init__(self) -> None:
+        self._body_tmpl = """
+<?xml version="1.0"?>
+<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+        xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" >
+    <s:Body>
+        {}
+    </s:Body>
+</s:Envelope>
+        """
+        self._scheme = 'urn:schemas-upnp-org:service:WANIPConnection:1'
+        self._header_tmpl = '"{}#'.format(self._scheme) + '{}"'
+
+    def ext_ip(self) -> 'RequestBuilder':
+        self._body = """
+            <m:GetExternalIPAddress xmlns:m="{}">
+            </m:GetExternalIPAddress>
+        """.format(self._scheme)
+        self._header = 'GetExternalIPAddress'
+        return self
+
+    def get_port_mapping(self, port_index: int) -> 'RequestBuilder':
+        """
+        Args:
+            port_index: starting from 0.
+        """
+        self._body = """
+            <m:GetGenericPortMappingEntry xmlns:m="{}">
+                <NewPortMappingIndex>{}</NewPortMappingIndex>
+            </m:GetGenericPortMappingEntry>
+        """.format(self._scheme, port_index)
+        self._header = 'GetGenericPortMappingEntry'
+        return self
+
+    def add_port_mapping(self, mapping: PortMapping) -> 'RequestBuilder':
+        self._body = """
+            <m:AddPortMapping xmlns:m="{}">
+                <NewRemoteHost></NewRemoteHost>
+                <NewExternalPort>{ext_port}</NewExternalPort>
+                <NewProtocol>{protocol}</NewProtocol>
+                <NewInternalPort>{int_port}</NewInternalPort>
+                <NewInternalClient>{ip}</NewInternalClient>
+                <NewEnabled>1</NewEnabled>
+                <NewPortMappingDescription>{description}</NewPortMappingDescription>
+                <NewLeaseDuration>{duration}</NewLeaseDuration>
+            </u:AddPortMapping>
+        """.format(self._scheme,
+                   ext_port=mapping.external_port,
+                   protocol=mapping.protocol,
+                   int_port=mapping.internal_port,
+                   ip=mapping.ip,
+                   description=mapping.description,
+                   duration=mapping.duration,
+                   )
+        self._header = 'AddPortMapping'
+        return self
+
+    def delete_port_mapping(self, ext_port: int,
+                            protocol: str) -> 'RequestBuilder':
+        self._body = """
+            <m:DeletePortMapping xmlns:m="{}">
+                <NewRemoteHost></NewRemoteHost>
+                <NewExternalPort>{ext_port}</NewExternalPort>
+                <NewProtocol>{protocol}</NewProtocol>
+            </u:DeletePortMapping>
+        """.format(self._scheme, ext_port=ext_port, protocol=protocol)
+        self._header = 'DeletePortMapping'
+        return self
+
+    def body(self) -> str:
+        """Constructs request body."""
+        return self._body_tmpl.format(self._body)
+
+    def header(self) -> str:
+        """Constructs request HTTP header."""
+        return self._header_tmpl.format(self._header)
+
+
+def get_ext_ip() -> str:
+    b = RequestBuilder()
+    b.ext_ip()
+    return b.header(), b.body()
+
+
+def parse_ext_ip(xml_resp: bytes) -> str:
+    doc = BeautifulSoup(xml_resp, 'lxml-xml')
+    return doc.NewExternalIPAddress.string
+
+
+def get_port_mapping(i: int) -> str:
+    b = RequestBuilder()
+    b.get_port_mapping(i)
+    return b.header(), b.body()
+
+
 def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
     """
     Note: skips remote host field, because I wasn't sure about def it's use.
     """
-    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#AddPortMapping"'
-    body = """<?xml version="1.0"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-    <s:Body>
-        <u:AddPortMapping xmlns:u="urn:schemas-upnp-org:service:WANIPConnection:1">
-            <NewRemoteHost></NewRemoteHost>
-            <NewExternalPort>{ext_port}</NewExternalPort>
-            <NewProtocol>{protocol}</NewProtocol>
-            <NewInternalPort>{int_port}</NewInternalPort>
-            <NewInternalClient>{ip}</NewInternalClient>
-            <NewEnabled>1</NewEnabled>
-            <NewPortMappingDescription>{description}</NewPortMappingDescription>
-            <NewLeaseDuration>{duration}</NewLeaseDuration>
-        </u:AddPortMapping>
-    </s:Body>
-</s:Envelope>""".format(
-        ext_port=mapping.external_port,
-        protocol=mapping.protocol,
-        int_port=mapping.internal_port,
-        ip=mapping.ip,
-        description=mapping.description,
-        duration=mapping.duration,
-    )
-    return header, body
+    b = RequestBuilder()
+    b.add_port_mapping(mapping)
+    return b.header(), b.body()
 
 
 def delete_port_mapping(ext_port: int, protocol: str) -> Tuple[str, str]:
     """
     Note: skips remote host field, because I wasn't sure about def it's use.
     """
-    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping"'
-    body = """<?xml version="1.0"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-    <s:Body>
-        <u:DeletePortMapping xmlns:u="urn:schemas-upnp-org:service:WANIPConnection:1">
-            <NewRemoteHost></NewRemoteHost>
-            <NewExternalPort>{ext_port}</NewExternalPort>
-            <NewProtocol>{protocol}</NewProtocol>
-        </u:DeletePortMapping>
-    </s:Body>
-</s:Envelope>""".format(
-        ext_port=ext_port,
-        protocol=protocol,
-    )
-    return header, body
+    b = RequestBuilder()
+    b.delete_port_mapping(ext_port, protocol)
+    return b.header(), b.body()
 
 
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:
