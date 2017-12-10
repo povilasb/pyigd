@@ -61,7 +61,7 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
     help='Removes port mapping that match given filters.',
 )
 def rm():
-    pass
+    curio.run(core.delete_port_mapping, 50479, 'TCP')
 
 
 @click.group()

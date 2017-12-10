@@ -88,6 +88,27 @@ def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
     return header, body
 
 
+def delete_port_mapping(ext_port: int, protocol: str) -> Tuple[str, str]:
+    """
+    Note: skips remote host field, because I wasn't sure about def it's use.
+    """
+    header = '"urn:schemas-upnp-org:service:WANIPConnection:1#DeletePortMapping"'
+    body = """<?xml version="1.0"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:DeletePortMapping xmlns:u="urn:schemas-upnp-org:service:WANIPConnection:1">
+            <NewRemoteHost></NewRemoteHost>
+            <NewExternalPort>{ext_port}</NewExternalPort>
+            <NewProtocol>{protocol}</NewProtocol>
+        </u:DeletePortMapping>
+    </s:Body>
+</s:Envelope>""".format(
+        ext_port=ext_port,
+        protocol=protocol,
+    )
+    return header, body
+
+
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:
     doc = BeautifulSoup(xml_resp, 'lxml-xml')
     return PortMapping(

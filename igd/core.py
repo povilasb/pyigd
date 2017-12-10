@@ -24,6 +24,11 @@ async def add_port_mapping(mapping: proto.PortMapping) -> None:
     await gateway.add_port_mapping(mapping)
 
 
+async def delete_port_mapping(ext_port: int, protocol: str) -> None:
+    gateway = await ssdp.find_gateway()
+    await gateway.delete_port_mapping(ext_port, protocol)
+
+
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:
     headers = ['Description', 'External Port', 'Protocol', 'Internal Port',
                'IP', 'Status']
