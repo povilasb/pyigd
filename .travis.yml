@@ -1,0 +1,12 @@
+language: python
+
+python:
+  - "3.6"
+  - "3.6-dev"
+
+script:
+  - make lint
+  - make test
+
+after_success:
+  - $VIRTUAL_ENV/bin/coveralls
