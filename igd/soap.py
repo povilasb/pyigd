@@ -49,3 +49,5 @@ def _validate_response(resp: asks.response_objects.Response) -> None:
         err_code = int(doc.errorCode.string)
         err_msg = doc.errorDescription.string
         raise Error(err_code, err_msg)
+    if resp.status_code != 200:
+        raise Error(resp.status_code, 'Unknwon error')
