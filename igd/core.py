@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from tabulate import tabulate
 from curio import socket
+import curio
 
 from . import ssdp, proto, Gateway
 
@@ -46,9 +47,11 @@ async def _delete_port_mappings_by_description(gateway: Gateway, pattern: str,
     mappings = await gateway.get_port_mappings()
     mappings = [m for m in mappings if m.description == pattern and
                 m.protocol in protocols]
-    for mapping in mappings:
-        await gateway.delete_port_mapping(mapping.external_port,
-                                          mapping.protocol)
+    tasks = [await curio.spawn(gateway.delete_port_mapping,
+                               m.external_port, m.protocol) for m in mappings]
+    for t in tasks:
+        # TODO: add timeout
+        await t.join()
 
 
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:
