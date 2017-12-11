@@ -1,27 +1,27 @@
 src_dir := igd
 
 python ?= python3.6
-virtualenv_dir := pyenv
-pip := $(virtualenv_dir)/bin/python -m pip
-pytest := $(virtualenv_dir)/bin/py.test
-linter := $(virtualenv_dir)/bin/python -m flake8
+VIRTUAL_ENV ?= pyenv
+pip := $(VIRTUAL_ENV)/bin/python -m pip
+pytest := $(VIRTUAL_ENV)/bin/py.test
+linter := $(VIRTUAL_ENV)/bin/python -m flake8
 py_requirements ?= requirements/prod.txt requirements/dev.txt
-mypy := $(virtualenv_dir)/bin/python -m mypy
+mypy := $(VIRTUAL_ENV)/bin/python -m mypy
 
 
 .PHONY: test
-test: $(virtualenv_dir)
+test: $(VIRTUAL_ENV)
 	PYTHONPATH=$(PYTHONPATH):. $(pytest) -s --cov=$(src_dir) tests
 
 .PHONY: lint
-lint: $(virtualenv_dir)
+lint: $(VIRTUAL_ENV)
 	$(linter) $(src_dir)
 
 .PHONY: check-types
-check-types: $(virtualenv_dir)
+check-types: $(VIRTUAL_ENV)
 	$(mypy) --ignore-missing-imports $(src_dir)
 
-$(virtualenv_dir): $(py_requirements)
+$(VIRTUAL_ENV): $(py_requirements)
 	$(python) -m venv $@
 	for r in $^ ; do \
 		$(pip) install -r $$r ; \
