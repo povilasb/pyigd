@@ -2,6 +2,11 @@
 About
 =====
 
+.. image:: https://travis-ci.org/povilasb/pyigd.svg?branch=master
+    :target: https://travis-ci.org/povilasb/pyigd
+.. image:: https://coveralls.io/repos/github/povilasb/pyigd/badge.svg?branch=master
+    :target: https://coveralls.io/github/povilasb/pyigd?branch=master
+
 This is a small python based tool to interact with IGD capable devices.
 IGD is protocol, usually supported by routers, that allows you to:
 
