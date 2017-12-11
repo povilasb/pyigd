@@ -62,10 +62,13 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
          'not specified, mappings for both UDP and TCP are removed.',
 )
 @click.option('--protocol', '-p', 'protocol', type=str,
-              help='UDP or TCP. Mixed letter case allowed.',)
-@click.argument('external_port', type=int, required=True,)
-def rm(external_port: int, protocol: Optional[str]):
-    curio.run(core.delete_port_mapping, external_port, protocol)
+              help='If not specified, all mappings matching given pattern '
+                   'are removed. Otherwise, only the mappings with given '
+                   'protcol are removed: UDP or TCP. Mixed letter case '
+                   'allowed.',)
+@click.argument('pattern', type=str, required=True,)
+def rm(pattern: str, protocol: Optional[str]):
+    curio.run(core.delete_port_mapping, pattern, protocol)
 
 
 @click.group()

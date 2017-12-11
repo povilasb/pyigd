@@ -3,7 +3,7 @@ from typing import List, Optional
 from tabulate import tabulate
 from curio import socket
 
-from . import ssdp, proto
+from . import ssdp, proto, Gateway
 
 
 async def get_ip() -> None:
@@ -24,11 +24,31 @@ async def add_port_mapping(mapping: proto.PortMapping) -> None:
     await gateway.add_port_mapping(mapping)
 
 
-async def delete_port_mapping(ext_port: int, protocol: Optional[str]) -> None:
+# TODO: return how many ports were removed
+async def delete_port_mapping(pattern: str, protocol: Optional[str]) -> None:
+    """Deletes port mappings by given pattern."""
     gateway = await ssdp.find_gateway()
-    protocols = [protocol] if protocol is not None else ['TCP', 'UDP']
+    protocols = [protocol.upper()] if protocol is not None else ['TCP', 'UDP']
+    if pattern.isdigit():
+        await _delete_port_mappings_by_port(gateway, int(pattern), protocols)
+    else:
+        await _delete_port_mappings_by_description(gateway, pattern, protocols)
+
+
+async def _delete_port_mappings_by_port(gateway: Gateway, ext_port: int,
+                                        protocols: List[str]) -> None:
     for prot in protocols:
         await gateway.delete_port_mapping(ext_port, prot)
+
+
+async def _delete_port_mappings_by_description(gateway: Gateway, pattern: str,
+                                               protocols: List[str]) -> None:
+    mappings = await gateway.get_port_mappings()
+    mappings = [m for m in mappings if m.description == pattern and
+                m.protocol in protocols]
+    for mapping in mappings:
+        await gateway.delete_port_mapping(mapping.external_port,
+                                          mapping.protocol)
 
 
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:
