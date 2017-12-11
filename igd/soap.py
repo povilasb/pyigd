@@ -10,7 +10,22 @@ class Error(Exception):
         self.code = code
 
 
-async def post(url: str, msg: str, soap_action: str) -> bytes:
+class Response:
+    """SOAP response."""
+
+    def __init__(self, body: str, status_code: int) -> None:
+        self.body = body
+        self.status_code = status_code
+
+    def xml(self) -> BeautifulSoup:
+        """
+        Returns:
+            xml document build from response body.
+        """
+        return BeautifulSoup(self.body, 'lxml-xml')
+
+
+async def post(url: str, msg: str, soap_action: str) -> Response:
     """
     Args:
         msg: SOAP xml based message.
@@ -25,7 +40,7 @@ async def post(url: str, msg: str, soap_action: str) -> bytes:
     }
     resp = await asks.post(url, data=msg, headers=headers)
     _validate_response(resp)
-    return resp.content
+    return Response(resp.content, resp.status_code)
 
 
 def _validate_response(resp: asks.response_objects.Response) -> None:
