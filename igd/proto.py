@@ -102,17 +102,6 @@ class RequestBuilder:
         return self._header_tmpl.format(self._header)
 
 
-def get_ext_ip() -> str:
-    b = RequestBuilder()
-    b.ext_ip()
-    return b.header(), b.body()
-
-
-def parse_ext_ip(xml_resp: bytes) -> str:
-    doc = BeautifulSoup(xml_resp, 'lxml-xml')
-    return doc.NewExternalIPAddress.string
-
-
 def get_port_mapping(i: int) -> str:
     b = RequestBuilder()
     b.get_port_mapping(i)

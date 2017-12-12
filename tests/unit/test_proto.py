@@ -33,21 +33,3 @@ def describe_parse_port_mapping():
         assert_that(port_mapping.enabled, is_(True))
         assert_that(port_mapping.description, is_('pyigd'))
         assert_that(port_mapping.duration, is_(100))
-
-
-def describe_parse_ext_ip():
-    def it_extracts_external_ip_from_xml_response():
-        xml_resp = b"""
-        <?xml version="1.0"?>
-        <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-            <SOAP-ENV:Body>
-                <u:GetExternalIPAddressResponse xmlns:u="urn:schemas-upnp-org:service:WANIPConnection:1">
-                    <NewExternalIPAddress>1.2.3.4</NewExternalIPAddress>
-                </u:GetExternalIPAddressResponse>
-            </SOAP-ENV:Body>
-        </SOAP-ENV:Envelope>
-        """
-
-        ext_ip = proto.parse_ext_ip(xml_resp)
-
-        assert_that(ext_ip, is_('1.2.3.4'))

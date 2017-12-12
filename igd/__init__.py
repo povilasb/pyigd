@@ -9,9 +9,9 @@ class Gateway:
         self.ip = ip
 
     async def get_ext_ip(self) -> str:
-        soap_action, body = proto.get_ext_ip()
-        resp = await soap.post(self.control_url, body, soap_action)
-        return proto.parse_ext_ip(resp)
+        req = proto.RequestBuilder().ext_ip()
+        resp = await soap.post(self.control_url, req.body(), req.header())
+        return resp.xml().NewExternalIPAddress.string
 
     # TODO: make it async, now every request is made synchronously
     # until all mappings are fetched. The reason is this issue:
