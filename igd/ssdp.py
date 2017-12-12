@@ -50,7 +50,7 @@ def _parse_location_from(response: str) -> str:
         filter(lambda x: x[0].lower() == 'location', parsed))
 
     if not len(location_header):
-        return False
+        raise Exception('location header not present')
     return location_header[0][1]
 
 
