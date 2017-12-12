@@ -13,7 +13,7 @@ class Error(Exception):
 class Response:
     """SOAP response."""
 
-    def __init__(self, body: str, status_code: int) -> None:
+    def __init__(self, body: bytes, status_code: int) -> None:
         self.body = body
         self.status_code = status_code
 
