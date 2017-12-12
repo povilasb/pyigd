@@ -102,15 +102,6 @@ class RequestBuilder:
         return self._header_tmpl.format(self._header)
 
 
-def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
-    """
-    Note: skips remote host field, because I wasn't sure about def it's use.
-    """
-    b = RequestBuilder()
-    b.add_port_mapping(mapping)
-    return b.header(), b.body()
-
-
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:
     doc = BeautifulSoup(xml_resp, 'lxml-xml')
     return PortMapping(

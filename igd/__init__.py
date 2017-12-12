@@ -38,8 +38,8 @@ class Gateway:
         return proto.parse_port_mapping(resp.body)
 
     async def add_port_mapping(self, mapping: proto.PortMapping) -> None:
-        soap_action, req = proto.add_port_mapping(mapping)
-        await soap.post(self.control_url, req, soap_action)
+        req = proto.RequestBuilder().add_port_mapping(mapping)
+        await soap.post(self.control_url, req.body(), req.header())
 
     async def delete_port_mapping(self, ext_port: int, protocol: str) -> None:
         req = proto.RequestBuilder().delete_port_mapping(ext_port, protocol)
