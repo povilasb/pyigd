@@ -34,16 +34,20 @@ class Gateway:
 
     async def get_port_mapping(self, i: int) -> proto.PortMapping:
         req = proto.RequestBuilder().get_port_mapping(i)
-        resp = await soap.post(self.control_url, req.body(), req.header())
+        resp = await self._make_request(req)
         return proto.parse_port_mapping(resp.body)
 
     async def add_port_mapping(self, mapping: proto.PortMapping) -> None:
         req = proto.RequestBuilder().add_port_mapping(mapping)
-        await soap.post(self.control_url, req.body(), req.header())
+        await self._make_request(req)
 
     async def delete_port_mapping(self, ext_port: int, protocol: str) -> None:
         req = proto.RequestBuilder().delete_port_mapping(ext_port, protocol)
-        await soap.post(self.control_url, req.body(), req.header())
+        await self._make_request(req)
+
+    async def _make_request(self, req: proto.RequestBuilder) -> soap.Response:
+        return await soap.post(self.control_url, req.body(), req.header())
+
 
     def __str__(self) -> str:
         return 'Gateway( control_url: "{}" )'.format(self.control_url)
