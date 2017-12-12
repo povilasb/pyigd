@@ -7,12 +7,12 @@ import curio
 from . import ssdp, proto, Gateway
 
 
-async def get_ip() -> None:
+async def get_ip() -> str:
     gateway = await ssdp.find_gateway()
     return await gateway.get_ext_ip()
 
 
-async def get_port_mappings() -> List[proto.PortMapping]:
+async def get_port_mappings() -> str:
     gateway = await ssdp.find_gateway()
     mappings = await gateway.get_port_mappings()
     return _format_mappings(mappings)
@@ -61,10 +61,10 @@ def _format_mappings(mappings: List[proto.PortMapping]) -> str:
     return tabulate(mappings, headers=headers)
 
 
-def _port_mapping_to_arr(mapping: proto.PortMapping) -> list:
+def _port_mapping_to_arr(mapping: proto.PortMapping) -> List[str]:
     status = 'Enabled' if mapping.enabled else 'Disabled'
-    return [mapping.description, mapping.external_port, mapping.protocol,
-            mapping.internal_port, mapping.ip, status]
+    return [mapping.description, str(mapping.external_port), mapping.protocol,
+            str(mapping.internal_port), mapping.ip, status]
 
 
 async def _get_local_ip_to(gateway_ip: str) -> str:
