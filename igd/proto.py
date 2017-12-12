@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 class PortMapping:
     def __init__(self, remote_host: str, external_port: int,
                  internal_port: int, protocol: str, ip: str, enabled: bool,
-                 description: str, duration: int):
+                 description: str, duration: int) -> None:
         self.remote_host = remote_host
         self.external_port = external_port
         self.internal_port = internal_port
@@ -100,12 +100,6 @@ class RequestBuilder:
     def header(self) -> str:
         """Constructs request HTTP header."""
         return self._header_tmpl.format(self._header)
-
-
-def get_port_mapping(i: int) -> str:
-    b = RequestBuilder()
-    b.get_port_mapping(i)
-    return b.header(), b.body()
 
 
 def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
