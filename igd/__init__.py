@@ -42,8 +42,8 @@ class Gateway:
         await soap.post(self.control_url, req, soap_action)
 
     async def delete_port_mapping(self, ext_port: int, protocol: str) -> None:
-        soap_action, req = proto.delete_port_mapping(ext_port, protocol)
-        await soap.post(self.control_url, req, soap_action)
+        req = proto.RequestBuilder().delete_port_mapping(ext_port, protocol)
+        await soap.post(self.control_url, req.body(), req.header())
 
     def __str__(self) -> str:
         return 'Gateway( control_url: "{}" )'.format(self.control_url)

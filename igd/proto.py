@@ -111,15 +111,6 @@ def add_port_mapping(mapping: PortMapping) -> Tuple[str, str]:
     return b.header(), b.body()
 
 
-def delete_port_mapping(ext_port: int, protocol: str) -> Tuple[str, str]:
-    """
-    Note: skips remote host field, because I wasn't sure about def it's use.
-    """
-    b = RequestBuilder()
-    b.delete_port_mapping(ext_port, protocol)
-    return b.header(), b.body()
-
-
 def parse_port_mapping(xml_resp: bytes) -> PortMapping:
     doc = BeautifulSoup(xml_resp, 'lxml-xml')
     return PortMapping(
