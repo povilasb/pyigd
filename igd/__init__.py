@@ -48,6 +48,5 @@ class Gateway:
     async def _make_request(self, req: proto.RequestBuilder) -> soap.Response:
         return await soap.post(self.control_url, req.body(), req.header())
 
-
     def __str__(self) -> str:
         return 'Gateway( control_url: "{}" )'.format(self.control_url)
