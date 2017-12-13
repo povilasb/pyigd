@@ -19,7 +19,7 @@ def describe__port_mapping_to_arr():
 
         assert_that(
             values,
-            is_(['test mapping', 5000, 'TCP', 6000, '192.168.1.10', 'Enabled'])
+            is_(['test mapping', '5000', 'TCP', '6000', '192.168.1.10', 'Enabled'])
         )
 
 
