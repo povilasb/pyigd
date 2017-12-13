@@ -57,8 +57,8 @@ async def _delete_port_mappings_by_description(gateway: Gateway, pattern: str,
 def _format_mappings(mappings: List[proto.PortMapping]) -> str:
     headers = ['Description', 'External Port', 'Protocol', 'Internal Port',
                'IP', 'Status']
-    mappings = [_port_mapping_to_arr(m) for m in mappings]
-    return tabulate(mappings, headers=headers)
+    rows = [_port_mapping_to_arr(m) for m in mappings]
+    return tabulate(rows, headers=headers)
 
 
 def _port_mapping_to_arr(mapping: proto.PortMapping) -> List[str]:
