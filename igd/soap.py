@@ -6,8 +6,11 @@ class Error(Exception):
     """SOAP error."""
 
     def __init__(self, code: int, msg: str) -> None:
-        super().__init__(msg)
         self.code = code
+        self.message = msg
+
+    def __str__(self) -> str:
+        return '"{}", error code: {}'.format(self.message, self.code)
 
 
 class Response:
