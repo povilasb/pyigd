@@ -4,7 +4,7 @@ from tabulate import tabulate
 from curio import socket
 import curio
 
-from . import ssdp, proto, Gateway
+from . import ssdp, proto, soap, Gateway
 
 
 async def get_ip() -> str:
@@ -39,7 +39,11 @@ async def delete_port_mapping(pattern: str, protocol: Optional[str]) -> None:
 async def _delete_port_mappings_by_port(gateway: Gateway, ext_port: int,
                                         protocols: List[str]) -> None:
     for prot in protocols:
-        await gateway.delete_port_mapping(ext_port, prot)
+        try:
+            await gateway.delete_port_mapping(ext_port, prot)
+        except soap.Error as e:
+            if e.code != soap.ERROR_INVALID_ARGS:
+                raise e
 
 
 async def _delete_port_mappings_by_description(gateway: Gateway, pattern: str,

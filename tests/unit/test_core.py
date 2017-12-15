@@ -5,7 +5,7 @@ import curio
 
 from igd.proto import PortMapping
 from igd.core import _port_mapping_to_arr, delete_port_mapping
-from igd import core
+from igd import core, soap
 
 from utils import AsyncMock
 
@@ -61,6 +61,28 @@ def describe__delete_port_mappings_by_port():
 
         gateway.delete_port_mapping.assert_any_call(4000, 'TCP')
         gateway.delete_port_mapping.assert_any_call(4000, 'UDP')
+
+    def describe_soap_error_is_received():
+        def describe_when_error_is_invalid_args():
+            def it_continues_silently():
+                gateway = AsyncMock()
+                gateway.delete_port_mapping.side_effect = soap.Error(
+                    soap.ERROR_INVALID_ARGS, 'test error')
+
+                curio.run(core._delete_port_mappings_by_port(gateway, 4000, ['TCP']))
+
+        def describe_when_error_is_unknown():
+            def it_reraises_it():
+                gateway = AsyncMock()
+                gateway.delete_port_mapping.side_effect = soap.Error(999, 'test error')
+
+                async def del_port():
+                    try:
+                        await core._delete_port_mappings_by_port(gateway, 4000, ['TCP'])
+                    except soap.Error as e:
+                        assert_that(e.code, is_(999))
+
+                curio.run(del_port)
 
 
 def describe__delete_port_mappings_by_description():
