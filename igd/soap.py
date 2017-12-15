@@ -2,6 +2,11 @@ import asks
 from bs4 import BeautifulSoup
 
 
+# Might happen when:
+# * deleting port mapping which does not exist.
+ERROR_INVALID_ARGS = 402
+
+
 class Error(Exception):
     """SOAP error."""
 
