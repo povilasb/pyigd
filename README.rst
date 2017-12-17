@@ -20,6 +20,33 @@ checked, open source liraries are reused, etc.
 
 Sorry, no Python 2 support.
 
+Install
+=======
+
+TODO
+
+Usage
+=====
+
+.. image:: usage.gif
+
+`igd` aims for ergonomic usage with convenient defaults but also tries to
+give full control over how ports are mapped, listed and removed.
+
+For more detailed description just use the `--help` option for each command::
+
+    $igd --help
+    Usage: igd [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      add  Add new port mapping.
+      ip   Get external IP from IGD.
+      ls   Get all port mappings.
+      rm   Remove port mapping.
+
 Other projects
 ==============
 
