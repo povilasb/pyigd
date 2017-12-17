@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 # Might happen when:
 # * deleting port mapping which does not exist.
 ERROR_INVALID_ARGS = 402
+ERROR_INVALID_ACTION = 401
+ERROR_ACTION_FAILED = 501
 
 
 class Error(Exception):
@@ -16,6 +18,14 @@ class Error(Exception):
 
     def __str__(self) -> str:
         return '"{}", error code: {}'.format(self.message, self.code)
+
+
+class InvalidArgsError(Error):
+    pass
+
+
+class HttpError(Error):
+    pass
 
 
 class Response:
@@ -56,6 +66,10 @@ def _validate_response(resp: asks.response_objects.Response) -> None:
         doc = BeautifulSoup(resp.content, 'lxml-xml')
         err_code = int(doc.errorCode.string)
         err_msg = doc.errorDescription.string
+
+        if err_code == ERROR_INVALID_ARGS:
+            raise InvalidArgsError(err_code, err_msg)
         raise Error(err_code, err_msg)
+
     if resp.status_code != 200:
-        raise Error(resp.status_code, 'Unknwon error')
+        raise HttpError(resp.status_code, 'Unknwon error')
