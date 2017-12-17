@@ -7,9 +7,13 @@ import curio
 from . import ssdp, proto, soap, Gateway
 
 
-async def get_ip() -> str:
+async def get_ip() -> None:
     gateway = await ssdp.find_gateway()
-    return await gateway.get_ext_ip()
+    try:
+        ip = await gateway.get_ext_ip()
+        print(ip)
+    except soap.HttpError as e:
+        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
 
 
 async def get_port_mappings() -> str:
@@ -19,10 +23,26 @@ async def get_port_mappings() -> str:
 
 
 async def add_port_mapping(mapping: proto.PortMapping) -> None:
+    try:
+        await _add_port_mapping(mapping)
+    except soap.HttpError as e:
+        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
+    except soap.InvalidArgsError as e:
+        print('Invalid SOAP argument: {}'.format(e.message))
+
+
+async def _add_port_mapping(mapping: proto.PortMapping) -> None:
     gateway = await ssdp.find_gateway()
     if mapping.ip is None:
         mapping.ip = await _get_local_ip_to(gateway.ip)
     await gateway.add_port_mapping(mapping)
+
+
+async def delete_port_mappings(pattern: str, protocol: Optional[str]) -> None:
+    try:
+        await delete_port_mapping(pattern, protocol)
+    except soap.HttpError as e:
+        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
 
 
 # TODO: return how many ports were removed

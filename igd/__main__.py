@@ -20,8 +20,7 @@ def ls():
     help='Finds Internet Gateway Device and queries for externl IP.',
 )
 def ip():
-    ext_ip = curio.run(core.get_ip)
-    print(ext_ip)
+    curio.run(core.get_ip)
 
 
 @click.command(
@@ -68,7 +67,7 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
                    'allowed.',)
 @click.argument('pattern', type=str, required=True,)
 def rm(pattern: str, protocol: Optional[str]):
-    curio.run(core.delete_port_mapping, pattern, protocol)
+    curio.run(core.delete_port_mappings, pattern, protocol)
 
 
 @click.group()
