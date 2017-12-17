@@ -23,7 +23,13 @@ Sorry, no Python 2 support.
 Install
 =======
 
-TODO
+::
+
+    $ pip3 install igd
+
+or if you want to get latest development changes::
+
+    $ pip3 install git+https://github.com/povilasb/pyigd
 
 Usage
 =====
