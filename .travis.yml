@@ -8,6 +8,7 @@ script:
   - make lint
   - make test
   - make check-types
+  - make security-test
 
 after_success:
   - $VIRTUAL_ENV/bin/coveralls

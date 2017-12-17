@@ -21,6 +21,10 @@ lint: $(VIRTUAL_ENV)
 check-types: $(VIRTUAL_ENV)
 	$(mypy) --ignore-missing-imports $(src_dir)
 
+.PHONY: security-test
+security-test: $(virtualenv_dir)
+	$(VIRTUAL_ENV)/bin/bandit -r $(src_dir)
+
 $(VIRTUAL_ENV): $(py_requirements)
 	$(python) -m venv $@
 	for r in $^ ; do \
