@@ -70,7 +70,7 @@ class RequestBuilder:
             </u:AddPortMapping>
         """.format(self._scheme,
                    ext_port=mapping.external_port,
-                   protocol=mapping.protocol,
+                   protocol=mapping.protocol.upper(),
                    int_port=mapping.internal_port,
                    ip=mapping.ip,
                    description=mapping.description,
