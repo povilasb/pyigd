@@ -1,6 +1,8 @@
 from unittest.mock import patch, MagicMock, ANY
+import io
 
 from hamcrest import assert_that, is_
+import pytest
 import curio
 
 from igd.proto import PortMapping
@@ -23,12 +25,27 @@ def describe_handle_exceptions():
 
     def describe_when_expected_exceptions_happen():
         @patch('sys.stdout', MagicMock())
-        def it_makes_wrapped_function_not_to_fail():
+        @pytest.mark.parametrize('error', [
+            soap.HttpError(500, 'Server error'),
+            soap.InvalidArgsError(402, 'Invalid args')
+        ])
+        def it_makes_wrapped_function_not_to_fail(error):
             @core.handle_exceptions
             async def func():
-                raise soap.HttpError(500, 'Server error')
+                raise error
 
             curio.run(func)
+
+def describe_get_ip():
+    def it_prints_external_ip_address():
+        gateway = AsyncMock()
+        gateway.get_ext_ip.async_return_value = '1.2.3.4'
+
+        with patch('igd.ssdp.find_gateway', AsyncMock(async_return_value=gateway)):
+            with patch('sys.stdout', new_callable=io.StringIO) as out:
+                curio.run(core.get_ip)
+
+                assert_that(out.getvalue(), is_('1.2.3.4\n'))
 
 
 def describe__port_mapping_to_arr():
@@ -78,7 +95,7 @@ def describe__delete_port_mappings_by_port():
     def it_deletes_port_for_every_given_protocol():
         gateway = AsyncMock()
 
-        curio.run(core._delete_port_mappings_by_port( gateway, 4000, ['TCP', 'UDP']))
+        curio.run(core._delete_port_mappings_by_port(gateway, 4000, ['TCP', 'UDP']))
 
         gateway.delete_port_mapping.assert_any_call(4000, 'TCP')
         gateway.delete_port_mapping.assert_any_call(4000, 'UDP')
