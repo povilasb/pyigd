@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 
 from tabulate import tabulate
 from curio import socket
@@ -7,13 +7,26 @@ import curio
 from . import ssdp, proto, soap, Gateway
 
 
+def handle_exceptions(func: Callable) -> Callable[..., Any]:
+    """Helper function to reduce boilerplate to handle expected exceptions.
+
+    Works with async functions only.
+    """
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except soap.HttpError as e:
+            print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
+        except soap.InvalidArgsError as e:
+            print('Invalid SOAP argument: {}'.format(e.message))
+    return wrapper
+
+
+@handle_exceptions
 async def get_ip() -> None:
     gateway = await ssdp.find_gateway()
-    try:
-        ip = await gateway.get_ext_ip()
-        print(ip)
-    except soap.HttpError as e:
-        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
+    ip = await gateway.get_ext_ip()
+    print(ip)
 
 
 async def get_port_mappings() -> str:
@@ -22,31 +35,17 @@ async def get_port_mappings() -> str:
     return _format_mappings(mappings)
 
 
+@handle_exceptions
 async def add_port_mapping(mapping: proto.PortMapping) -> None:
-    try:
-        await _add_port_mapping(mapping)
-    except soap.HttpError as e:
-        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
-    except soap.InvalidArgsError as e:
-        print('Invalid SOAP argument: {}'.format(e.message))
-
-
-async def _add_port_mapping(mapping: proto.PortMapping) -> None:
     gateway = await ssdp.find_gateway()
     if mapping.ip is None:
         mapping.ip = await _get_local_ip_to(gateway.ip)
     await gateway.add_port_mapping(mapping)
 
 
-async def delete_port_mappings(pattern: str, protocol: Optional[str]) -> None:
-    try:
-        await delete_port_mapping(pattern, protocol)
-    except soap.HttpError as e:
-        print('Unexpected HTTP error: {} {}'.format(e.code, e.message))
-
-
 # TODO: return how many ports were removed
-async def delete_port_mapping(pattern: str, protocol: Optional[str]) -> None:
+@handle_exceptions
+async def delete_port_mappings(pattern: str, protocol: Optional[str]) -> None:
     """Deletes port mappings by given pattern."""
     gateway = await ssdp.find_gateway()
     protocols = [protocol.upper()] if protocol is not None else ['TCP', 'UDP']

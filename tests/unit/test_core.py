@@ -4,10 +4,31 @@ from hamcrest import assert_that, is_
 import curio
 
 from igd.proto import PortMapping
-from igd.core import _port_mapping_to_arr, delete_port_mapping
+from igd.core import _port_mapping_to_arr, delete_port_mappings
 from igd import core, soap
 
 from utils import AsyncMock
+
+
+def describe_handle_exceptions():
+    def describe_when_given_function_succeeds():
+        def it_returns_what_function_returns():
+            @core.handle_exceptions
+            async def func():
+                return 10
+
+            retval = curio.run(func)
+
+            assert_that(retval, is_(10))
+
+    def describe_when_expected_exceptions_happen():
+        @patch('sys.stdout', MagicMock())
+        def it_makes_wrapped_function_not_to_fail():
+            @core.handle_exceptions
+            async def func():
+                raise soap.HttpError(500, 'Server error')
+
+            curio.run(func)
 
 
 def describe__port_mapping_to_arr():
@@ -23,14 +44,14 @@ def describe__port_mapping_to_arr():
         )
 
 
-def describe_delete_port_mapping():
+def describe_delete_port_mappings():
     def describe_when_pattern_is_port():
         def describe_when_protocol_is_not_specified():
             @patch('igd.ssdp.find_gateway', AsyncMock())
             def it_deletes_mappings_for_all_possible_protocols():
                 with patch('igd.core._delete_port_mappings_by_port',
                            AsyncMock()) as delete_mappings:
-                    curio.run(delete_port_mapping('4000', None))
+                    curio.run(delete_port_mappings('4000', None))
 
                     delete_mappings.assert_called_with(ANY, 4000, ['TCP', 'UDP'])
 
@@ -39,7 +60,7 @@ def describe_delete_port_mapping():
             def it_deletes_mapping_for_given_port_and_protocol():
                 with patch('igd.core._delete_port_mappings_by_port',
                            AsyncMock()) as delete_mappings:
-                    curio.run(delete_port_mapping('4000', 'TCP'))
+                    curio.run(delete_port_mappings('4000', 'TCP'))
 
                     delete_mappings.assert_called_with(ANY, 4000, ['TCP'])
 
@@ -48,7 +69,7 @@ def describe_delete_port_mapping():
         def it_deletes_mappings_by_description():
             with patch('igd.core._delete_port_mappings_by_description',
                        AsyncMock()) as delete_mappings:
-                curio.run(delete_port_mapping('Skype', None))
+                curio.run(delete_port_mappings('Skype', None))
 
                 delete_mappings.assert_called_with(ANY, 'Skype', ['TCP', 'UDP'])
 
