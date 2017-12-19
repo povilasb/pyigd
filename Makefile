@@ -11,7 +11,8 @@ mypy := $(VIRTUAL_ENV)/bin/python -m mypy
 
 .PHONY: test
 test: $(VIRTUAL_ENV)
-	PYTHONPATH=$(PYTHONPATH):. $(pytest) -s --cov=$(src_dir) tests
+	PYTHONPATH=$(PYTHONPATH):. $(pytest) -s --cov-report term-missing \
+		--cov=$(src_dir) tests
 
 .PHONY: lint
 lint: $(VIRTUAL_ENV)
