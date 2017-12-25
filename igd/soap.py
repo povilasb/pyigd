@@ -24,6 +24,7 @@ class Error(Exception):
 class InvalidArgsError(Error):
     pass
 
+
 class InvalidArrayIndex(Error):
     pass
 
