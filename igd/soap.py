@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 ERROR_INVALID_ARGS = 402
 ERROR_INVALID_ACTION = 401
 ERROR_ACTION_FAILED = 501
+ERROR_INVALID_ARRAY_INDEX = 713
 
 
 class Error(Exception):
@@ -21,6 +22,9 @@ class Error(Exception):
 
 
 class InvalidArgsError(Error):
+    pass
+
+class InvalidArrayIndex(Error):
     pass
 
 
@@ -69,6 +73,8 @@ def _validate_response(resp: asks.response_objects.Response) -> None:
 
         if err_code == ERROR_INVALID_ARGS:
             raise InvalidArgsError(err_code, err_msg)
+        elif err_code == ERROR_INVALID_ARRAY_INDEX:
+            raise InvalidArrayIndex(err_code, err_msg)
         raise Error(err_code, err_msg)
 
     if resp.status_code != 200:

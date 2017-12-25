@@ -58,6 +58,22 @@ def describe__validate_response():
                     raises(soap.InvalidArgsError)
                 )
 
+        def describe_and_soap_error_is_713():
+            def it_raises_invalid_array_index_error():
+                resp = MagicMock()
+                resp.status_code = 500
+                resp.content = b"""
+                    <xml>
+                        <errorCode>713</errorCode>
+                        <errorDescription>SpecifiedArrayIndexInvalid</errorDescription>
+                    </xml>
+                """
+
+                assert_that(
+                    calling(soap._validate_response).with_args(resp),
+                    raises(soap.InvalidArrayIndex)
+                )
+
         def describe_and_soap_error_is_some_unknown_error():
             def it_raises_generic_soap_error():
                 resp = MagicMock()
