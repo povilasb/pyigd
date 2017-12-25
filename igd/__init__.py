@@ -24,11 +24,8 @@ class Gateway:
             try:
                 mappings.append(await self.get_port_mapping(i))
                 i += 1
-            except soap.Error as e:
-                if e.code == 402:
-                    break
-                else:
-                    raise e
+            except (soap.InvalidArgsError, soap.InvalidArrayIndex):
+                break
 
         return mappings
 
