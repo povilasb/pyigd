@@ -104,7 +104,7 @@ def describe__delete_port_mappings_by_port():
         def describe_when_error_is_invalid_args():
             def it_continues_silently():
                 gateway = AsyncMock()
-                gateway.delete_port_mapping.side_effect = soap.Error(
+                gateway.delete_port_mapping.side_effect = soap.InvalidArgsError(
                     soap.ERROR_INVALID_ARGS, 'test error')
 
                 curio.run(core._delete_port_mappings_by_port(gateway, 4000, ['TCP']))

@@ -8,6 +8,7 @@ ERROR_INVALID_ARGS = 402
 ERROR_INVALID_ACTION = 401
 ERROR_ACTION_FAILED = 501
 ERROR_INVALID_ARRAY_INDEX = 713
+ERROR_NO_SUCH_ENTRY_IN_ARRAY = 714
 
 
 class Error(Exception):
@@ -26,6 +27,10 @@ class InvalidArgsError(Error):
 
 
 class InvalidArrayIndex(Error):
+    pass
+
+
+class NoSuchEntryInArray(Error):
     pass
 
 
@@ -76,6 +81,8 @@ def _validate_response(resp: asks.response_objects.Response) -> None:
             raise InvalidArgsError(err_code, err_msg)
         elif err_code == ERROR_INVALID_ARRAY_INDEX:
             raise InvalidArrayIndex(err_code, err_msg)
+        elif err_code == ERROR_NO_SUCH_ENTRY_IN_ARRAY:
+            raise NoSuchEntryInArray(err_code, err_msg)
         raise Error(err_code, err_msg)
 
     if resp.status_code != 200:

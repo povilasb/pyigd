@@ -60,9 +60,8 @@ async def _delete_port_mappings_by_port(gateway: Gateway, ext_port: int,
     for prot in protocols:
         try:
             await gateway.delete_port_mapping(ext_port, prot)
-        except soap.Error as e:
-            if e.code != soap.ERROR_INVALID_ARGS:
-                raise e
+        except (soap.InvalidArgsError, soap.NoSuchEntryInArray):
+            pass
 
 
 async def _delete_port_mappings_by_description(gateway: Gateway, pattern: str,
