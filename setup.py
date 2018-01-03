@@ -15,7 +15,7 @@ def requirements() -> list:
 
 setup(
     name='igd',
-    version='0.1.0',
+    version='0.1.1',
     description='IGD management CLI tool.',
     long_description=open('README.rst').read(),
     url='https://github.com/povilasb/pyigd',
