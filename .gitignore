@@ -1,4 +1,7 @@
 pyenv/
 .cache/
+.mypy_cache/
+dist/
+*.egg-info/
 **/*.pyc
 .coverage
