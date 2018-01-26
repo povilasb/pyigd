@@ -68,4 +68,5 @@ References
 * https://tools.ietf.org/html/draft-cai-ssdp-v1-03
 * https://tools.ietf.org/html/rfc6970
 * http://www.upnp.org/specs/gw/UPnP-gw-WANIPConnection-v1-Service.pdf
+* http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v2.0.pdf
 * http://www.upnp-hacks.org
