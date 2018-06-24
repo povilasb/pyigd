@@ -16,7 +16,7 @@ IGD is protocol, usually supported by routers, that allows you to:
 
 This tool aims to be simple, clean, easy to install, hackable tool. Hence, CI is
 enabled, test coverage should be kept to the maximum, code is linted, types are
-checked, open source liraries are reused, etc.
+checked, open source libraries are reused, etc.
 
 Sorry, no Python 2 support.
 
