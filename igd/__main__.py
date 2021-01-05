@@ -6,7 +6,9 @@ import selectors
 import socket
 
 from . import core, proto
-
+selector = selectors.DefaultSelector()
+dummy_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+selector.register(dummy_socket, selectors.EVENT_READ)
 
 
 @click.command(
@@ -87,7 +89,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    selector = selectors.DefaultSelector()
-    dummy_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    selector.register(dummy_socket, selectors.EVENT_READ)
     main()
