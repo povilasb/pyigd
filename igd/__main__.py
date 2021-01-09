@@ -2,8 +2,13 @@ from typing import Optional
 
 import curio
 import click
+import selectors
+import socket
 
 from . import core, proto
+selector = selectors.DefaultSelector()
+dummy_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+selector.register(dummy_socket, selectors.EVENT_READ)
 
 
 @click.command(
@@ -11,7 +16,7 @@ from . import core, proto
     help='Get all port mappings. Various filtering options available.',
 )
 def ls():
-    port_mapping = curio.run(core.get_port_mappings)
+    port_mapping = curio.run(core.get_port_mappings, selector=selector)
     print(port_mapping)
 
 
@@ -20,7 +25,7 @@ def ls():
     help='Finds Internet Gateway Device and queries for externl IP.',
 )
 def ip():
-    curio.run(core.get_ip)
+    curio.run(core.get_ip, selector=selector)
 
 
 @click.command(
@@ -52,7 +57,7 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
     mapping = proto.PortMapping(
         '', internal_port, external_port, protocol, ip, True, description,
         duration)
-    curio.run(core.add_port_mapping, mapping)
+    curio.run(core.add_port_mapping, mapping, selector=selector)
 
 
 @click.command(
@@ -67,7 +72,7 @@ def add(external_port: int, internal_port: Optional[int], ip: Optional[str],
                    'allowed.',)
 @click.argument('pattern', type=str, required=True,)
 def rm(pattern: str, protocol: Optional[str]):
-    curio.run(core.delete_port_mappings, pattern, protocol)
+    curio.run(core.delete_port_mappings, pattern, protocol, selector=selector)
 
 
 @click.group()
