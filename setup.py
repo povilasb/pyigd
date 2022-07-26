@@ -3,13 +3,12 @@ from setuptools import setup, find_packages
 
 def requirements() -> list:
     return [
-        'click==6.7',
-        'curio==0.8',
-        'asks==1.3.6',
-        'yarl==0.15.0',
-        'lxml==4.1.1',
-        'beautifulsoup4==4.6.0',
-        'tabulate==0.8.2',
+        'click',
+        'curio',
+        'asks',
+        'yarl',
+        'beautifulsoup4',
+        'tabulate',
     ]
 
 
