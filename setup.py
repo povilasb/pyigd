@@ -7,7 +7,7 @@ def requirements() -> list:
         'curio==0.8',
         'asks==1.3.6',
         'yarl==0.15.0',
-        'lxml==4.1.1',
+        'lxml==4.9.1',
         'beautifulsoup4==4.6.0',
         'tabulate==0.8.2',
     ]
